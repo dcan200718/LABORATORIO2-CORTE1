@@ -1,71 +1,72 @@
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
 public class CRUDArchivo {
-   //CREAR USUARIO
-    public static void crearUsuario(Usuario usuario) throws IOException {
-    FileWriter fw = new FileWriter("usuarios.txt", true);
-    BufferedWriter bw = new BufferedWriter(fw);
-    bw.write(usuario.toString());
-    bw.newLine();
-    bw.close();
-    System.out.println("usuario agregado correctamente");
-   }
-}
-//LEER USUARIO
-public static List<usuario> leerUsuarios() 
-throws IOException {
-    List<usuario> lista = new ArrayList<>();
-    Scanner sc = new Scanner(new File("usuarios.txt"));
+    private static final String ARCHIVO = "usuarios.txt";
 
-    while (sc.hasNextLine()) {
-        String[] datos = sc.nextLine().split(",");
-        lista.add(new Usuario(
-            Integer.parseInt(datos[0]),
-            datos[1],
-            datos[2]));
+    public CRUDArchivo() {
     }
-    sc.close();
-    return lista;
-}
-      </usuario></usuario>
 
-
-      //ACTUALIZAR
-public static void actualizarUsuario(int id, 
-String nuevoNombre, String nuevoEmail) 
-throws IOException {
-
-    List<usuario> lista = leerUsuarios();
-    BufferedWriter bw = 
-        new BufferedWriter(new FileWriter("usuarios.txt"));
-
-    for (Usuario u : lista) {
-        if (u.getId() == id) {
-            u.setNombre(nuevoNombre);
-            u.setEmail(nuevoEmail);
-        }
-        bw.write(u.toString());
-        bw.newLine();
-    }
-    bw.close();
-}
-      </usuario>
-
-//ELIMINAR
-public static void eliminarUsuario(int id) 
-throws IOException {
-
-    List<usuario> lista = leerUsuarios();
-    BufferedWriter bw = 
-        new BufferedWriter(new FileWriter("usuarios.txt"));
-
-    for (Usuario u : lista) {
-        if (u.getId() != id) {
-            bw.write(u.toString());
+    public void crearUsuario(Usuario usuario) throws IOException {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(ARCHIVO, true))) {
+            bw.write(usuario.toString());
             bw.newLine();
         }
     }
-    bw.close();
+
+    public List<Usuario> leerUsuarios() throws IOException {
+        List<Usuario> lista = new ArrayList<>();
+        File f = new File(ARCHIVO);
+        if (!f.exists()) return lista;
+        try (Scanner sc = new Scanner(f)) {
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                if (line.trim().isEmpty()) continue;
+                String[] datos = line.split(",");
+                if (datos.length < 3) continue;
+                lista.add(new Usuario(
+                    Integer.parseInt(datos[0].trim()),
+                    datos[1].trim(),
+                    datos[2].trim()));
+            }
+        }
+        return lista;
+    }
+
+    public void actualizarUsuario(int id, String nuevoNombre, String nuevoEmail) throws IOException {
+        List<Usuario> lista = leerUsuarios();
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(ARCHIVO))) {
+            for (Usuario u : lista) {
+                if (u.getId() == id) {
+                    u.setNombre(nuevoNombre);
+                    u.setEmail(nuevoEmail);
+                }
+                bw.write(u.toString());
+                bw.newLine();
+            }
+        }
+    }
+
+    public void eliminarUsuario(int id) throws IOException {
+        List<Usuario> lista = leerUsuarios();
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(ARCHIVO))) {
+            for (Usuario u : lista) {
+                if (u.getId() != id) {
+                    bw.write(u.toString());
+                    bw.newLine();
+                }
+            }
+        }
+    }
+
 }
-      </usuario>
+
+
+ 
+
 //hola
-
-
